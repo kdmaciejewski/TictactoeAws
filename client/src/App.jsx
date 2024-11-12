@@ -33,12 +33,14 @@ function App() {
         const code = queryParams.get("code");
 
         if (code) {
-            // const clientID = process.env.REACT_APP_COGNITO_CLIENT_ID || "";
-            // const clientSecret = process.env.REACT_APP_COGNITO_CLIENT_SECRET || "";
-            // const cognitoDomain = process.env.REACT_APP_COGNITO_DOMAIN || "";
-            const clientID = "3ijg7078a9lf88kinp193l86dv";
-            const clientSecret = "bdomhjia5vfn1pm6kmlr6n438k9352o5i8qgfjef88d8eicgkg7";
-            const cognitoDomain = "https://tiktak.auth.us-east-1.amazoncognito.com";
+            const clientID = import.meta.env.VITE_APP_COGNITO_CLIENT_ID || "";
+            const clientSecret = import.meta.env.VITE_APP_COGNITO_CLIENT_SECRET || "";
+            const cognitoDomain = import.meta.env.VITE_APP_COGNITO_DOMAIN || "";
+            // const clientID = "3ijg7078a9lf88kinp193l86dv";
+            // const clientSecret = "bdomhjia5vfn1pm6kmlr6n438k9352o5i8qgfjef88d8eicgkg7";
+            // const cognitoDomain = "https://tiktak.auth.us-east-1.amazoncognito.com";
+            const redUrl = import.meta.env.VITE_APP_PUBLIC_DNS || "";
+            const serverUrl = import.meta.env.VITE_APP_SERVER || "";
             const credentials = `${clientID}:${clientSecret}`;
             const base64Credentials = btoa(credentials);
             const basicAuthorization = `Basic ${base64Credentials}`;
@@ -51,7 +53,7 @@ function App() {
             data.append("grant_type", "authorization_code");
             data.append("client_id", clientID);
             data.append("code", code);
-            data.append("redirect_uri", "http://localhost:3000");
+            data.append("redirect_uri", redUrl);
 
             console.log('autoryzacja: ' + data);
             console.log('naglowwek: ' + headers);
@@ -79,7 +81,7 @@ function App() {
                         cookies.set("email", userInfo.data?.email);
                         const userId = userInfo.data.sub;
 
-                        const response = await axios.post("http://localhost:3001/signup", {userId});
+                        const response = await axios.post(`${serverUrl}/signup`, {userId});
 
                         if (response.status === 200) {
                             const {token} = response.data; // Get the token from the response
