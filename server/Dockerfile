@@ -10,12 +10,13 @@
 FROM node:18-alpine
 
 
-# Use production node environment by default.
-ENV NODE_ENV production
-
-
 WORKDIR /usr/src/app
 
+# Set memory allocation for Node.js
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
+# Use production node environment by default
+ENV NODE_ENV production
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.yarn to speed up subsequent builds.
 # Leverage a bind mounts to package.json and yarn.lock to avoid having to copy them into
