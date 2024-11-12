@@ -4,10 +4,7 @@
 # If you need more help, visit the Dockerfile reference guide at
 # https://docs.docker.com/engine/reference/builder/
 
-ARG NODE_VERSION=22.8.0
-
-FROM node:${NODE_VERSION}-alpine
-#FROM node:18-alpine
+FROM node:18-alpine
 
 
 WORKDIR /usr/src/app
