@@ -13,7 +13,7 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Set memory allocation for Node.js
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # Use production node environment by default
 ENV NODE_ENV production
