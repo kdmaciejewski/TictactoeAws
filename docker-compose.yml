@@ -9,6 +9,8 @@ services:
       - "3000:3000"  # Mapowanie portu 3000 kontenera na port 3000 hosta
     depends_on:
       - backend
+    env_file:
+      - ./client/.env
 
   backend:
     build:
