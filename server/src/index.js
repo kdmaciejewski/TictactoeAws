@@ -2,11 +2,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import messageRoutes from "./routes/messageRoutes.js";
-import { StreamChat } from "stream-chat";
-import { createDatabaseSchema } from "./db.js"; // Import the schema creation function
-import { CognitoUserPool } from 'amazon-cognito-identity-js';
+import {StreamChat} from "stream-chat";
+import {createDatabaseSchema} from "./db.js"; // Import the schema creation function
+import {CognitoUserPool} from 'amazon-cognito-identity-js';
 import pkg from 'pg'; // Adjusted import
-const { Pool } = pkg;
+const {Pool} = pkg;
 
 // Load environment variables
 dotenv.config();
@@ -16,8 +16,10 @@ const poolData = {
     // UserPoolId: process.env.COGNITO_USER_POOL_ID,
     // ClientId: process.env.COGNITO_CLIENT_ID
 
-    UserPoolId: 'us-east-1_UWMwgv1eF',
-    ClientId: '1n9uk5pnaor8p1t9jjdg9e45cn'
+    // UserPoolId: 'us-east-1_UWMwgv1eF',
+    // ClientId: '1n9uk5pnaor8p1t9jjdg9e45cn'
+    UserPoolId: 'us-east-1_QoiXTAHEw',
+    ClientId: '3ijg7078a9lf88kinp193l86dv'
 };
 
 // Initialize the PostgreSQL pool with the connection string from the environment
@@ -40,26 +42,26 @@ app.use("/api/messages", messageRoutes);
 
 
 app.post("/signup", async (req, res) => {
-  const { userId } = req.body;
-  try {
-    const token = serverClient.createToken(userId);
-    res.json({ token });
-  } catch (error) {
-    res.status(500).json(error);
-  }
+    const {userId} = req.body;
+    try {
+        const token = serverClient.createToken(userId);
+        res.json({token});
+    } catch (error) {
+        res.status(500).json(error);
+    }
 });
 
 app.post("/login", async (req, res) => {
-  const { username } = req.body;
-  try {
-    const { users } = await serverClient.queryUsers({ name: username });
-    if (users.length === 0) return res.status(404).json({ message: "User not found" });
+    const {username} = req.body;
+    try {
+        const {users} = await serverClient.queryUsers({name: username});
+        if (users.length === 0) return res.status(404).json({message: "User not found"});
 
-    const token = serverClient.createToken(users[0].id);
-    res.json({ token, userId: users[0].id }); // Send userId along with the token
-  } catch (error) {
-    res.status(500).json(error);
-  }
+        const token = serverClient.createToken(users[0].id);
+        res.json({token, userId: users[0].id}); // Send userId along with the token
+    } catch (error) {
+        res.status(500).json(error);
+    }
 });
 
 
@@ -67,6 +69,6 @@ app.post("/login", async (req, res) => {
 // createDatabaseSchema(pool);
 
 app.listen(3001, () => {
-  console.log("Server is running on port 3001");
+    console.log("Server is running on port 3001");
 });
 
