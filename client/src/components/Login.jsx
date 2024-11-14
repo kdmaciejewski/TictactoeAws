@@ -14,7 +14,7 @@ function Login({setIsAuth}) {
         const clientId = import.meta.env.VITE_APP_COGNITO_CLIENT_ID || ""; // Your Cognito Client ID
         const redirectUri = import.meta.env.VITE_APP_PUBLIC_DNS || ""; // Your redirect URI after login
 
-
+        console.log(redirectUri)
         const loginUrl = `${cognitoDomain}/login?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
         // const loginUrl = 'https://tiktak.auth.us-east-1.amazoncognito.com/login?response_type=code&' +
         //     'client_id=3ijg7078a9lf88kinp193l86dv&redirect_uri=http://localhost:3000';
