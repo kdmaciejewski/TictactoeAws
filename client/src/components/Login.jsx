@@ -16,6 +16,8 @@ function Login({setIsAuth}) {
 
         console.log(redirectUri)
         const loginUrl = `${cognitoDomain}/login?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
+
+
         // const loginUrl = 'https://tiktak.auth.us-east-1.amazoncognito.com/login?response_type=code&' +
         //     'client_id=3ijg7078a9lf88kinp193l86dv&redirect_uri=http://localhost:3000';
 
