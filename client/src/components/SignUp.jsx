@@ -10,9 +10,11 @@ const userPool = new CognitoUserPool(poolData);
 
 function SignUp({ setIsAuth }) {
   const redirectToSignUp = () => {
+    const cognitoDomain = import.meta.env.VITE_APP_COGNITO_DOMAIN || "";
     const redirectEnv = import.meta.env.VITE_APP_PUBLIC_DNS || "";
     const redirectUri = encodeURIComponent(redirectEnv); // Your app's redirect URL
-    const signUpUrl = `https://tiktak.auth.us-east-1.amazoncognito.com/signup?response_type=code&client_id=${poolData.ClientId}&redirect_uri=${redirectUri}`;
+    // const signUpUrl = `https://tiktak.auth.us-east-1.amazoncognito.com/signup?response_type=code&client_id=${poolData.ClientId}&redirect_uri=${redirectUri}`;
+    const signUpUrl = `${cognitoDomain}/signup?response_type=code&client_id=${poolData.ClientId}&redirect_uri=${redirectUri}`;
 
     window.location.href = signUpUrl; // Redirect to Cognito hosted UI sign-up page
   };
