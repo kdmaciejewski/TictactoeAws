@@ -80,8 +80,10 @@ function App() {
                         cookies.set("username", userInfo.data?.username);
                         cookies.set("email", userInfo.data?.email);
                         const userId = userInfo.data.sub;
+                        const userUsername = userInfo.data?.username;
+                        const userEmail = userInfo.data?.email;
 
-                        const response = await axios.post(`${serverUrl}/signup`, {userId});
+                        const response = await axios.post(`${serverUrl}/signup`, {userId, userUsername, userEmail});
 
                         if (response.status === 200) {
                             const {token} = response.data; // Get the token from the response
@@ -90,7 +92,7 @@ function App() {
                             console.error("Nie udało się tokenu signup:", response.data);
                         }
 
-                        console.log("testikik:" + cookies.get("streamToken"));
+                        console.log("testowanie:" + cookies.get("streamToken"));
                         setIsAuth(true); // Set authenticated state
                         return streamClient.connectUser(
                             {id: userId, name: userInfo.data.username},
