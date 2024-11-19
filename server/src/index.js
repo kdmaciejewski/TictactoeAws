@@ -4,11 +4,21 @@ import dotenv from "dotenv";
 import {StreamChat} from "stream-chat";
 import pkg from 'pg'; // Adjusted import
 const {Pool} = pkg;
+import fs from "fs";
+import https from "https";
+import http from "http";
 
-// Load environment variables
 dotenv.config();
+
+const key = fs.readFileSync("./src/certs/key.pem", 'utf8');
+const cert = fs.readFileSync("./src/certs/cert.crt", 'utf8');
+const credentials = {key: key, cert: cert};
 const app = express();
 
+const options = {
+  key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
+  cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
+};
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -99,7 +109,19 @@ app.get("/users", async (req, res) => {
 // Create the database schema on server start
 // createDatabaseSchema(pool);
 
-app.listen(3001, () => {
-    console.log("Server is running on port 3001");
-});
+// app.listen(3001, () => {
+//     console.log("Server is running on port 3001");
+// });
 
+// Replace app.listen with HTTPS server setup
+// https.createServer({ key, cert }, app).listen(3001, () => {
+//   console.log("HTTPS Server running on port 3001");
+// });
+
+// app.get("/", (req, res) => {
+//   res.send("Hello, secure world!");
+// });
+
+https.createServer(options, app).listen(3001, () => {
+  console.log("HTTPS server running on https://localhost:3001");
+});
