@@ -84,18 +84,18 @@ function App() {
                         const userUsername = userInfo.data.username;
                         const userEmail = userInfo.data.email;
 
-                        const responseSignup = await axios.post(`${serverUrl}/signup`, {
-                            userId,
-                            userUsername,
-                            userEmail
-                        });
+                        // const responseSignup = await axios.post(`${serverUrl}/signup`, {
+                        //     userId,
+                        //     userUsername,
+                        //     userEmail
+                        // });
 
-                        if (responseSignup.status === 200) {
-                            const {token} = responseSignup.data; // Get the token from the response
-                            cookies.set("streamToken", token, {path: "/"});
-                        } else {
-                            console.error("Signup failed:", responseSignup.data);
-                        }
+                        // if (responseSignup.status === 200) {
+                        //     const {token} = responseSignup.data; // Get the token from the response
+                        //     cookies.set("streamToken", token, {path: "/"});
+                        // } else {
+                        //     console.error("Signup failed:", responseSignup.data);
+                        // }
 
                         setIsAuth(true); // Set authenticated state
                         return streamClient.connectUser(
