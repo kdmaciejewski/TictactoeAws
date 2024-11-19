@@ -106,6 +106,25 @@ app.get("/users", async (req, res) => {
     }
 });
 
+app.get("/checkUser", async (req, res) => {
+    const { userUsername } = req.query;
+    try {
+        const query = "SELECT userid FROM Users WHERE username = $1";
+        const values = [userUsername];
+        const result = await pool.query(query, values);
+        console.log("tyle userow: " + result.rows.length);
+        if (result.rows.length > 0) {
+            res.status(200).json({ exists: true });
+        } else {
+            res.status(200).json({ exists: false });
+        }
+    } catch (error) {
+        console.error("Error checking user existence:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
 // Create the database schema on server start
 // createDatabaseSchema(pool);
 

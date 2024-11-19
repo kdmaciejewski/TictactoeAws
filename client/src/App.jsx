@@ -51,10 +51,6 @@ function App() {
             data.append("code", code);
             data.append("redirect_uri", redUrl);
 
-            console.log('Authorization data: ', data);
-            console.log('Authorization headers: ', headers);
-            console.log(cognitoDomain);
-
             axios
                 .post(`${cognitoDomain}/oauth2/token`, data, {headers})
                 .then((res) => {
@@ -66,40 +62,56 @@ function App() {
                     const userInfoHeaders = {
                         Authorization: "Bearer " + token,
                     };
-                    console.log("Token Response:", res.data);
 
                     return axios.get(`${cognitoDomain}/oauth2/userInfo`, {headers: userInfoHeaders});
                 })
                 .then(async (userInfo) => {
                     if (userInfo && userInfo.status === 200) {
-                        console.log("User Info:", userInfo.data);
-
-                        setName(userInfo.data?.username); // Access username directly
-                        setEmail(userInfo.data?.email); // Access email directly
-                        cookies.set("userId", userInfo.data?.sub); // Access sub directly
-                        cookies.set("username", userInfo.data?.username);
-                        cookies.set("email", userInfo.data?.email);
-
                         const userId = userInfo.data.sub;
                         const userUsername = userInfo.data.username;
                         const userEmail = userInfo.data.email;
 
-                        // const responseSignup = await axios.post(`${serverUrl}/signup`, {
-                        //     userId,
-                        //     userUsername,
-                        //     userEmail
-                        // });
+                        setName(userUsername);
+                        setEmail(userEmail);
 
-                        // if (responseSignup.status === 200) {
-                        //     const {token} = responseSignup.data; // Get the token from the response
-                        //     cookies.set("streamToken", token, {path: "/"});
-                        // } else {
-                        //     console.error("Signup failed:", responseSignup.data);
-                        // }
+                        cookies.set("userId", userId);
+                        cookies.set("username", userUsername);
+                        cookies.set("email", userEmail);
+
+                        // Check if the user already exists
+                        const userExistsResponse = await axios.get(`${serverUrl}/checkUser`, {
+                            params: {userUsername},
+                        });
+                        console.log(userExistsResponse.data.exists)
+                        if (userExistsResponse.status === 200 && userExistsResponse.data.exists) {
+                            // User exists, proceed with login
+                            const loginResponse = await axios.post(`${serverUrl}/login`, {userId});
+
+                            if (loginResponse.status === 200) {
+                                const {token} = loginResponse.data;
+                                cookies.set("streamToken", token, {path: "/"});
+                            } else {
+                                console.error("Login failed:", loginResponse.data);
+                            }
+                        } else {
+                            // User doesn't exist, proceed with signup
+                            const responseSignup = await axios.post(`${serverUrl}/signup`, {
+                                userId,
+                                userUsername,
+                                userEmail,
+                            });
+
+                            if (responseSignup.status === 200) {
+                                const {token} = responseSignup.data;
+                                cookies.set("streamToken", token, {path: "/"});
+                            } else {
+                                console.error("Signup failed:", responseSignup.data);
+                            }
+                        }
 
                         setIsAuth(true); // Set authenticated state
                         return streamClient.connectUser(
-                            {id: userId, name: userInfo.data.username},
+                            {id: userId, name: userUsername},
                             cookies.get("streamToken")
                         );
                     }
@@ -110,7 +122,6 @@ function App() {
         }
     }, []);
 
-    console.log("stream: " + streamToken);
 
     return (
         <div className="App">
