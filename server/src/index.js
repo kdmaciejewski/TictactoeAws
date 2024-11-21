@@ -115,7 +115,6 @@ app.get("/checkUser", async (req, res) => {
         const result = await pool.query(query, values);
         console.log("tyle userow: " + result.rows.length);
         if (result.rows.length > 0) {
-
             res.status(200).json({ exists: true });
             console.log("true")
         } else {

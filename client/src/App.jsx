@@ -79,6 +79,7 @@ function App() {
                         cookies.set("email", userEmail);
 
                         // Check if the user already exists
+                        console.log("przed checkuser: " + userUsername);
                         const userExistsResponse = await axios.get(`${serverUrl}/checkUser`, {
                             params: {userUsername},
                         });
