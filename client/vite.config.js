@@ -19,8 +19,8 @@ export default defineConfig({
   },
   server: {
     https: {
-      key:fs.readFileSync("./localhost.key"),
-      cert:fs.readFileSync("./localhost.crt")
+      key:fs.readFileSync("./key.pem"),
+      cert:fs.readFileSync("./cert.crt")
     },
     watch: {
       usePolling: true, // Enable polling for changes

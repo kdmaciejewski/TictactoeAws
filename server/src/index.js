@@ -10,14 +10,14 @@ import http from "http";
 
 dotenv.config();
 
-const key = fs.readFileSync("./src/certs/localhost.key", 'utf8');
-const cert = fs.readFileSync("./src/certs/localhost.crt", 'utf8');
+const key = fs.readFileSync("./src/certs/key.pem", 'utf8');
+const cert = fs.readFileSync("./src/certs/cert.crt", 'utf8');
 const credentials = {key: key, cert: cert};
 const app = express();
 
 const options = {
-  key: fs.readFileSync("./src/certs/localhost.key", 'utf8'),
-  cert: fs.readFileSync("./src/certs/localhost.crt", 'utf8'),
+  key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
+  cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
 };
 
 const pool = new Pool({
