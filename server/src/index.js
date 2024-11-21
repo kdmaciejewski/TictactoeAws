@@ -9,14 +9,18 @@ import https from "https";
 import http from "http";
 
 dotenv.config();
-if (process.env.NODE_ENV === "production") {
-  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
-  console.log("zmienione na 0 ")
-}
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
-const key = fs.readFileSync("./src/certs/key.pem", 'utf8');
-const cert = fs.readFileSync("./src/certs/cert.crt", 'utf8');
-const credentials = {key: key, cert: cert};
+// const httpsAgent = new https.Agent({
+//   ca: fs.readFileSync("./certs/key.pem"),
+// });
+// const options = {
+//   hostname: "localhost",
+//   port: 3001,
+//   agent: httpsAgent,
+// };
+
+
 const app = express();
 
 const options = {
