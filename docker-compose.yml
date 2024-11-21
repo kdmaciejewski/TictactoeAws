@@ -18,16 +18,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
-    environment:
-      DATABASE_URL: "postgres://postgres:Maciejewski12@db:5432/tictactoe"
-    depends_on:
-      - db
-
-  db:
-    image: postgres:latest  # Użycie obrazu Postgresa
-    environment:
-      POSTGRES_USER: postgres  # Użytkownik bazy danych
-      POSTGRES_PASSWORD: Maciejewski12  # Hasło użytkownika
-      POSTGRES_DB: tictactoe  # Nazwa bazy danych
-    ports:
-      - "5432:5432"  # Mapowanie portu bazy danych
+    env_file:
+      - ./server/.env
