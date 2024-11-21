@@ -10,6 +10,7 @@ import http from "http";
 
 dotenv.config();
 
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 const key = fs.readFileSync("./src/certs/key.pem", 'utf8');
 const cert = fs.readFileSync("./src/certs/cert.crt", 'utf8');
 const credentials = {key: key, cert: cert};
