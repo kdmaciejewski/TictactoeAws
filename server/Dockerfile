@@ -14,8 +14,8 @@ ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # Use production node environment by default
 ENV NODE_ENV production
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
-ENV DATABASE_URL=postgres://postgres:Maciejewski12@aws-rds.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/postgres
+#ENV NODE_TLS_REJECT_UNAUTHORIZED=0
+#ENV DATABASE_URL=postgres://postgres:Maciejewski12@aws-rds.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/postgres
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.yarn to speed up subsequent builds.
 # Leverage a bind mounts to package.json and yarn.lock to avoid having to copy them into
