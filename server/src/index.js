@@ -77,7 +77,7 @@ app.post("/signup", async (req, res) => {
 
         const token = serverClient.createToken(userId);
         console.log(token)
-        res.status(201).json({
+        res.status(200).json({
             message: "User created successfully",
             user: result.rows[0],
             token,

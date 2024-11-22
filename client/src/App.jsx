@@ -115,7 +115,8 @@ function App() {
                                     },
                                 }
                             );
-                            console.log("Nowy user ")
+                            console.log("Nowy user ");
+                            console.log(responseSignup.status);
                             if (responseSignup.status === 200) {
                                 const {token} = responseSignup.data;
                                 cookies.set("streamToken", token, {path: "/"});
