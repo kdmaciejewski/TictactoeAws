@@ -62,9 +62,9 @@ app.post("/signup", async (req, res) => {
     try {
         console.log("próba");
         const query = `
-            INSERT INTO Users (username, email)
-            VALUES ($1, $2)
-            ON CONFLICT (username) DO NOTHING
+            INSERT INTO Users (userid, username, email)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (userid) DO NOTHING
             RETURNING *;
         `;
         const values = [userUsername, userEmail];
