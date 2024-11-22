@@ -24,12 +24,12 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const app = express();
 
 const options = {
-  key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
-  cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
+    key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
+    cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
 };
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL,
 });
 
 const api_key = "842k9artxzb2";
@@ -48,18 +48,19 @@ app.use(express.json());
 //     }
 // });
 app.post("/signup", async (req, res) => {
-    const { userId, userUsername, userEmail } = req.body;
+    const {userId, userUsername, userEmail} = req.body;
 
     console.log(process.env.DATABASE_URL);
     pool.connect()
-    .then(() => console.log("Connected to RDS"))
-    .catch(err => console.error("Failed to connect to RDS", err));
+        .then(() => console.log("Connected to RDS"))
+        .catch(err => console.error("Failed to connect to RDS", err));
 
     if (!userId || !userUsername || !userEmail) {
-        return res.status(400).json({ error: "All fields are required." });
+        return res.status(400).json({error: "All fields are required."});
     }
-
+    console.log(userId + " " + userUsername + " " + userEmail);
     try {
+        console.log("próba");
         const query = `
             INSERT INTO Users (userid, username, email)
             VALUES ($1, $2, $3)
@@ -68,9 +69,10 @@ app.post("/signup", async (req, res) => {
         `;
         const values = [userId, userUsername, userEmail];
         const result = await pool.query(query, values);
+        console.log("rezultat: " + result);
 
         if (result.rowCount === 0) {
-            return res.status(200).json({ message: "User already exists." });
+            return res.status(200).json({message: "User already exists."});
         }
 
         const token = serverClient.createToken(userId);
@@ -81,6 +83,7 @@ app.post("/signup", async (req, res) => {
             token,
         });
     } catch (error) {
+        console.error("Error during signup:", error);
         res.status(500).json({
             error: "An error occurred while creating the user.",
             details: error.message,
@@ -115,7 +118,7 @@ app.get("/users", async (req, res) => {
 });
 
 app.get("/checkUser", async (req, res) => {
-    const { userUsername } = req.query;
+    const {userUsername} = req.query;
     console.log("WESZLLO")
     try {
         const query = "SELECT userid FROM Users WHERE username = $1";
@@ -123,17 +126,15 @@ app.get("/checkUser", async (req, res) => {
         const result = await pool.query(query, values);
         console.log("tyle userow: " + result.rows.length);
         if (result.rows.length > 0) {
-            res.status(200).json({ exists: true });
+            res.status(200).json({exists: true});
             console.log("true")
         } else {
-            res.status(200).json({ exists: false });
+            res.status(200).json({exists: false});
             console.log("false")
-
         }
-
     } catch (error) {
         console.error("Error checking user existence:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({error: "Internal Server Error"});
     }
 });
 
@@ -155,5 +156,5 @@ app.get("/checkUser", async (req, res) => {
 // });
 
 https.createServer(options, app).listen(3001, () => {
-  console.log("zmiana HTTPS server running on https://localhost:3001");
+    console.log("zmiana HTTPS server running on https://localhost:3001");
 });

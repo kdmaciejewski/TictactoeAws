@@ -96,17 +96,32 @@ function App() {
                             }
                         } else {
                             // User doesn't exist, proceed with signup
-                            const responseSignup = await axios.post(`${serverUrl}/signup`, {
-                                userId,
-                                userUsername,
-                                userEmail,
-                            });
-
+                            console.log("Co przesyłam: " + userId + " " + userUsername + " " + userEmail);
+                            // const responseSignup = await axios.post(`${serverUrl}/signup`, {
+                            //     userId,
+                            //     userUsername,
+                            //     userEmail,
+                            // });
+                            const responseSignup = await axios.post(
+                                `${serverUrl}/signup`,
+                                {
+                                    userId,
+                                    userUsername,
+                                    userEmail,
+                                },
+                                {
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                }
+                            );
+                            console.log("Nowy user ")
                             if (responseSignup.status === 200) {
                                 const {token} = responseSignup.data;
                                 cookies.set("streamToken", token, {path: "/"});
+                                console.log("Udało się dodać nowego usera")
                             } else {
-                                console.error("Signup failed:", responseSignup.data);
+                                console.error("Nie udało się dodać nowego usera, response: ", responseSignup.data);
                             }
                         }
 
