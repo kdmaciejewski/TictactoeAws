@@ -62,12 +62,12 @@ app.post("/signup", async (req, res) => {
     try {
         console.log("próba");
         const query = `
-            INSERT INTO Users (userid, username, email)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (userid) DO NOTHING
+            INSERT INTO Users (username, email)
+            VALUES ($1, $2)
+            ON CONFLICT (username) DO NOTHING
             RETURNING *;
         `;
-        const values = [userId, userUsername, userEmail];
+        const values = [userUsername, userEmail];
         const result = await pool.query(query, values);
         console.log("rezultat: " + result);
 
