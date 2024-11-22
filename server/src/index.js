@@ -67,7 +67,7 @@ app.post("/signup", async (req, res) => {
             ON CONFLICT (userid) DO NOTHING
             RETURNING *;
         `;
-        const values = [userUsername, userEmail];
+        const values = [userId, userUsername, userEmail];
         const result = await pool.query(query, values);
         console.log("rezultat: " + result);
 
