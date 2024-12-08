@@ -1,18 +1,15 @@
 import "./App.css";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
+import Chat from "./components/Chat"
 import {StreamChat} from "stream-chat";
-import {Chat} from "stream-chat-react";
 import Cookies from "universal-cookie";
 import {useState, useEffect} from "react";
-import JoinGame from "./components/JoinGame";
 import axios from "axios";
 
 function App() {
     const api_key = "842k9artxzb2";
     const cookies = new Cookies();
-    const streamToken = cookies.get("token"); // Stream token
-    const streamClient = StreamChat.getInstance(api_key);
     const [isAuth, setIsAuth] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -23,7 +20,6 @@ function App() {
         cookies.remove("userId");
         cookies.remove("username");
         cookies.remove("email");
-        streamClient.disconnectUser();
         setIsAuth(false);
     };
 
@@ -79,29 +75,15 @@ function App() {
                         cookies.set("email", userEmail);
 
                         // Check if the user already exists
-                        console.log("przed checkuser: " + userUsername);
                         const userExistsResponse = await axios.get(`${serverUrl}/checkUser`, {
                             params: {userUsername},
                         });
                         console.log(userExistsResponse.data.exists)
                         if (userExistsResponse.status === 200 && userExistsResponse.data.exists) {
-                            // User exists, proceed with login
-                            const loginResponse = await axios.post(`${serverUrl}/login`, {userId});
-
-                            if (loginResponse.status === 200) {
-                                const {token} = loginResponse.data;
-                                cookies.set("streamToken", token, {path: "/"});
-                            } else {
-                                console.error("Login failed:", loginResponse.data);
-                            }
+                            console.log("Logowanie")
                         } else {
                             // User doesn't exist, proceed with signup
                             console.log("Co przesyłam: " + userId + " " + userUsername + " " + userEmail);
-                            // const responseSignup = await axios.post(`${serverUrl}/signup`, {
-                            //     userId,
-                            //     userUsername,
-                            //     userEmail,
-                            // });
                             const responseSignup = await axios.post(
                                 `${serverUrl}/signup`,
                                 {
@@ -116,21 +98,8 @@ function App() {
                                 }
                             );
                             console.log("Nowy user ");
-                            console.log(responseSignup.status);
-                            if (responseSignup.status === 200) {
-                                const {token} = responseSignup.data;
-                                cookies.set("streamToken", token, {path: "/"});
-                                console.log("Udało się dodać nowego usera")
-                            } else {
-                                console.error("Nie udało się dodać nowego usera, response: ", responseSignup.data);
-                            }
                         }
-
                         setIsAuth(true); // Set authenticated state
-                        return streamClient.connectUser(
-                            {id: userId, name: userUsername},
-                            cookies.get("streamToken")
-                        );
                     }
                 })
                 .catch((err) => {
@@ -143,10 +112,10 @@ function App() {
     return (
         <div className="App">
             {isAuth ? (
-                <Chat client={streamClient}>
-                    <JoinGame/>
-                    <button onClick={logOut}> Log Out</button>
-                </Chat>
+                <>
+                    <Chat/>
+                    <button onClick={logOut}>Log Out</button>
+                </>
             ) : (
                 <>
                     <SignUp setIsAuth={setIsAuth}/>

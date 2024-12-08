@@ -8,6 +8,7 @@ resource "aws_instance" "frontend_instance" {
   tags = {
     Name = "Frontend"
   }
+  user_data = "${file("update_env_client.sh")}"
 #  user_data = file("update_env_client.sh")
 #  user_data = base64encode(templatefile("./update_env_client.sh.tpl", local.vars))
 }

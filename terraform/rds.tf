@@ -16,7 +16,7 @@ resource "aws_db_instance" "db" {
 resource "null_resource" "db_init" {
   provisioner "local-exec" {
     command = <<EOT
-      SET PGPASSWORD=postgres
+      export PGPASSWORD=postgres
       psql -h ${aws_db_instance.db.endpoint} -U postgres -d mydb -c "
       CREATE TABLE Users (
           userid VARCHAR(255) PRIMARY KEY,

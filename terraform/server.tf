@@ -8,5 +8,5 @@ resource "aws_instance" "backend_instance" {
   tags = {
     Name = "Backend"
   }
-#  user_data = file("update_env_server.sh")
+  user_data = file("update_env_server.sh")
 }

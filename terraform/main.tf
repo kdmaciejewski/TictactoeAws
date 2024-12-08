@@ -22,7 +22,7 @@ resource "aws_subnet" "app_subnet" {
     Name = "EC2SubnetGroup"
   }
 }
-#aws wymaga żeby RDS działał przynajmniej w w co najmniej dwóch strefach dostępności
+#aws wymaga żeby RDS działał przynajmniej w co najmniej dwóch strefach dostępności
 #aby umożliwić replikację danych i automatyczne przełączanie w przypadku awarii
 resource "aws_subnet" "app_subnet_a" {
   vpc_id                  = aws_vpc.app_vpc.id

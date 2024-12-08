@@ -13,8 +13,11 @@ cd /home/ubuntu/TictactoeAws
 
 # Aktualizacja pliku .env
 # Get the public IP addresses from Terraform output
-FRONTEND_IP=$(terraform output -raw frontend_public_ip)
-BACKEND_IP=$(terraform output -raw backend_public_ip)
+#FRONTEND_IP=$(terraform output -raw frontend_public_ip)
+#BACKEND_IP=$(terraform output -raw backend_public_ip)
+
+FRONTEND_IP=$(frontend_public_ip -f)
+BACKEND_IP=$(backend_public_ip -f)
 
 # Update .env file in the frontend folder
 echo "Aktualizacja .env dla frontendu"

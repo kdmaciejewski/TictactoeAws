@@ -10,43 +10,22 @@ import http from "http";
 
 dotenv.config();
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
-
-// const httpsAgent = new https.Agent({
-//   ca: fs.readFileSync("./certs/key.pem"),
-// });
-// const options = {
-//   hostname: "localhost",
-//   port: 3001,
-//   agent: httpsAgent,
-// };
-
-
 const app = express();
 
 const options = {
     key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
     cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
+    // key: fs.readFileSync("./localhost.key", 'utf8'),
+    // cert: fs.readFileSync("./localhost.crt", 'utf8'),
 };
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 });
 
-const api_key = "842k9artxzb2";
-const api_secret = "qmv88zpghbgrty3kj9y86vb9tqeghadagn7mmv2mm5gyd3355j3f2ys6z5u3zyva";
-const serverClient = new StreamChat.getInstance(api_key, api_secret);
 app.use(cors());
 app.use(express.json());
 
-// app.post("/signup", async (req, res) => {
-//     const {userId, userUsername, userEmail} = req.body;
-//     try {
-//         const token = serverClient.createToken(userId);
-//         res.json({token});
-//     } catch (error) {
-//         res.status(500).json(error);
-//     }
-// });
 app.post("/signup", async (req, res) => {
     const {userId, userUsername, userEmail} = req.body;
 
@@ -55,9 +34,6 @@ app.post("/signup", async (req, res) => {
         .then(() => console.log("Connected to RDS"))
         .catch(err => console.error("Failed to connect to RDS", err));
 
-    if (!userId || !userUsername || !userEmail) {
-        return res.status(400).json({error: "All fields are required."});
-    }
     console.log(userId + " " + userUsername + " " + userEmail);
     try {
         console.log("próba");
@@ -75,14 +51,6 @@ app.post("/signup", async (req, res) => {
             return res.status(200).json({message: "User already exists."});
         }
 
-        const token = serverClient.createToken(userId);
-        console.log(token)
-        // res.status(200).json({
-        //     message: "User created successfully",
-        //     user: result.rows[0],
-        //     token,
-        // });
-        console.log("Wyswietlanie results.rows[0]: " + result.rows[0])
         res.status(200).json({
             message: "User created successfully",
             user: result.rows[0],
@@ -97,18 +65,6 @@ app.post("/signup", async (req, res) => {
     }
 });
 
-app.post("/login", async (req, res) => {
-    const {username} = req.body;
-    try {
-        const {users} = await serverClient.queryUsers({name: username});
-        if (users.length === 0) return res.status(404).json({message: "User not found"});
-
-        const token = serverClient.createToken(users[0].id);
-        res.json({token, userId: users[0].id}); // Send userId along with the token
-    } catch (error) {
-        res.status(500).json(error);
-    }
-});
 
 app.get("/users", async (req, res) => {
     try {
@@ -141,6 +97,39 @@ app.get("/checkUser", async (req, res) => {
     } catch (error) {
         console.error("Error checking user existence:", error);
         res.status(500).json({error: "Internal Server Error"});
+    }
+});
+
+app.get("/messages", async (req, res) => {
+    try {
+        const query = "SELECT id, text FROM messages";
+        const result = await pool.query(query);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        res.status(500).json({
+            error: "An error occurred while fetching messages.",
+            details: error.message,
+        });
+    }
+});
+
+app.post("/messages", async (req, res) => {
+    const { text } = req.body;
+
+    try {
+        const query = "INSERT INTO messages (text) VALUES ($1) RETURNING id, text";
+        const values = [text];
+        const result = await pool.query(query, values);
+
+        res.status(201).json({
+            message: "Message added successfully.",
+            data: result.rows[0],
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: "An error occurred while adding the message.",
+            details: error.message,
+        });
     }
 });
 
