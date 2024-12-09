@@ -2,7 +2,6 @@ import "./App.css";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Chat from "./components/Chat"
-import {StreamChat} from "stream-chat";
 import Cookies from "universal-cookie";
 import {useState, useEffect} from "react";
 import axios from "axios";

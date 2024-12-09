@@ -11,11 +11,11 @@ cd TictactoeAws
 git pull origin vite
 cd /home/ubuntu/TictactoeAws
 
-FRONTEND_IP="34.201.10.43"
-BACKEND_IP="35.170.65.220"
+FRONTEND_IP="44.208.25.10"
+BACKEND_IP="3.82.99.7"
 echo "Aktualizacja .env dla frontendu"
 sed -i "s|VITE_APP_PUBLIC_DNS=.*|VITE_APP_PUBLIC_DNS=https://$FRONTEND_IP:3000|" client/.env
-sed -i "s|VITE_APP_SERVER=https://$BACKEND_IP:3001|" client/.env
+sed -i "s|VITE_APP_SERVER=.*|VITE_APP_SERVER=https://$BACKEND_IP:3001|" client/.env
 
 echo "Generowanie certyfikatów..."
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /home/ubuntu/TictactoeAws/client/key.pem -out /home/ubuntu/TictactoeAws/client/cert.crt -subj "/CN=$FRONTEND_IP" -addext "subjectAltName=IP:$FRONTEND_IP"

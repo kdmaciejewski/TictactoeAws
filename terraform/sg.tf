@@ -3,15 +3,20 @@ resource "aws_security_group" "frontback-sg" {
   description = "Frontend and Backend sg"
   vpc_id      = aws_vpc.app_vpc.id
 
-  # Allow all incoming traffic (for testing purposes)
+  # Allow all incoming traffic (all protocols)
   ingress {
     from_port   = 0
-    to_port     = 65535
+    to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  # Allow all egress traffic
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # Allow all outgoing traffic (all protocols)
   egress {
     from_port   = 0
     to_port     = 0
@@ -32,7 +37,7 @@ resource "aws_security_group" "rds-sg" {
   # Allow all incoming traffic (for testing purposes)
   ingress {
     from_port   = 0
-    to_port     = 65535
+    to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }

@@ -12,22 +12,18 @@ resource "aws_db_instance" "db" {
   publicly_accessible  = true
 }
 
-# Provisioner to initialize the DB with schema and insert data
-resource "null_resource" "db_init" {
-  provisioner "local-exec" {
-    command = <<EOT
-      export PGPASSWORD=postgres
-      psql -h ${aws_db_instance.db.endpoint} -U postgres -d mydb -c "
-      CREATE TABLE Users (
-          userid VARCHAR(255) PRIMARY KEY,
-          username VARCHAR(255) UNIQUE NOT NULL,
-          email VARCHAR(255) UNIQUE NOT NULL
-      );
-      INSERT INTO Users (userid, username, email) VALUES ('1', 'terraform_test_user', 'test@example.com');
-      "
-    EOT
-  }
-}
+
+#resource "null_resource" "db_setup" {
+#  provisioner "local-exec" {
+#    command = "psql -h ${aws_db_instance.db.endpoint} -p 5432 -U postgres -d mydb -f \"db_script.sql\""
+#
+#    environment = {
+#      PGPASSWORD = "postgres"
+#    }
+#    interpreter = ["bash", "-c"]
+#  }
+#}
+
 
 
 output "db_host" {

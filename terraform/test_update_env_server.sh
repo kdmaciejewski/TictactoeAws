@@ -1,7 +1,10 @@
 #!/bin/bash
 sudo apt-get update -y
 sudo apt-get upgrade -y
-sudo apt-get install -y docker.io git openssl
+sudo apt-get install -y docker.io git openssl postgresql
+
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
 
 echo "Klonowanie repozytorium..."
 cd /home/ubuntu
@@ -10,7 +13,7 @@ cd TictactoeAws
 git pull origin vite
 cd /home/ubuntu/TictactoeAws
 
-DB_HOST="terraform-20241124095132056700000004.c16ejl6j0lwa.us-east-1.rds.amazonaws.com"
+DB_HOST="terraform-20241208182807859100000004.c16ejl6j0lwa.us-east-1.rds.amazonaws.com"
 DB_NAME="mydb"
 DB_USERNAME="postgres"
 DB_PASSWORD="postgres"
@@ -20,7 +23,7 @@ echo "DATABASE_URL=postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME" 
 sed -i "s|DATABASE_URL=.*|DATABASE_URL=postgres://$DB_USERNAME:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME|" server/.env
 
 echo ".env files updated with frontend, backend IPs and RDS endpoint."
-BACKEND_IP="35.170.65.220"
+BACKEND_IP="54.91.207.245"
 echo "BACKEND_IP: $BACKEND_IP"
 
 echo "Generowanie certyfikatów..."

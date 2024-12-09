@@ -53,8 +53,7 @@ app.post("/signup", async (req, res) => {
 
         res.status(200).json({
             message: "User created successfully",
-            user: result.rows[0],
-            token,
+            user: result.rows[0]
         });
     } catch (error) {
         console.error("Error during signup:", error);
@@ -82,6 +81,10 @@ app.get("/users", async (req, res) => {
 app.get("/checkUser", async (req, res) => {
     const {userUsername} = req.query;
     console.log("WESZLLO")
+    console.log(process.env.DATABASE_URL);
+    pool.connect()
+        .then(() => console.log("Connected to RDS"))
+        .catch(err => console.error("Failed to connect to RDS", err));
     try {
         const query = "SELECT userid FROM Users WHERE username = $1";
         const values = [userUsername];
