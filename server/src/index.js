@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import {StreamChat} from "stream-chat";
 import pkg from 'pg'; // Adjusted import
 const {Pool} = pkg;
 import fs from "fs";
@@ -13,10 +12,10 @@ process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const app = express();
 
 const options = {
-    key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
-    cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
-    // key: fs.readFileSync("./localhost.key", 'utf8'),
-    // cert: fs.readFileSync("./localhost.crt", 'utf8'),
+    // key: fs.readFileSync("./src/certs/key.pem", 'utf8'),
+    // cert: fs.readFileSync("./src/certs/cert.crt", 'utf8'),
+    key: fs.readFileSync("./localhost.key", 'utf8'),
+    cert: fs.readFileSync("./localhost.crt", 'utf8'),
 };
 
 const pool = new Pool({
@@ -25,6 +24,23 @@ const pool = new Pool({
 
 app.use(cors());
 app.use(express.json());
+
+async function initializeDatabase() {
+  try {
+    const client = await pool.connect();
+    console.log("Connected to the database");
+
+    const sqlScript = fs.readFileSync("./src/db_script.sql", "utf8");
+    await client.query(sqlScript);
+    console.log("SQL script executed successfully");
+
+    client.release();
+  } catch (error) {
+    console.error("Failed to initialize database", error);
+  }
+}
+
+initializeDatabase();
 
 app.post("/signup", async (req, res) => {
     const {userId, userUsername, userEmail} = req.body;
@@ -140,19 +156,11 @@ app.post("/messages", async (req, res) => {
 // Create the database schema on server start
 // createDatabaseSchema(pool);
 
-// app.listen(3001, () => {
-//     console.log("Server is running on port 3001");
-// });
-
-// Replace app.listen with HTTPS server setup
-// https.createServer({ key, cert }, app).listen(3001, () => {
-//   console.log("HTTPS Server running on port 3001");
-// });
-
-// app.get("/", (req, res) => {
-//   res.send("Hello, secure world!");
-// });
-
-https.createServer(options, app).listen(3001, () => {
-    console.log("zmiana HTTPS server running on https://localhost:3001");
+app.listen(3001, () => {
+    console.log("HTTP server is running on port 3001");
 });
+
+
+// https.createServer(options, app).listen(3001, () => {
+//     console.log("zmiana HTTPS server running on https://localhost:3001");
+// });

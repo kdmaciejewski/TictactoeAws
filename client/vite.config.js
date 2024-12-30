@@ -1,12 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
-import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
   plugins: [
     react(),
-    // basicSsl(), // Enables basic SSL for HTTPS
   ],
   define: {
     global: 'globalThis',
@@ -18,10 +16,6 @@ export default defineConfig({
     },
   },
   server: {
-    https: {
-      key:fs.readFileSync("./key.pem"),
-      cert:fs.readFileSync("./cert.crt")
-    },
     watch: {
       usePolling: true, // Enable polling for changes
     },
@@ -37,18 +31,15 @@ export default defineConfig({
 
 
 
-
-
-
+//stare:
 // import { defineConfig } from 'vite';
 // import react from '@vitejs/plugin-react';
+// import fs from 'fs';
 // import basicSsl from '@vitejs/plugin-basic-ssl';
-// import mkcert from 'vite-plugin-mkcert'
 //
 // export default defineConfig({
 //   plugins: [
 //     react(),
-//     mkcert(),
 //     // basicSsl(), // Enables basic SSL for HTTPS
 //   ],
 //   define: {
@@ -61,11 +52,10 @@ export default defineConfig({
 //     },
 //   },
 //   server: {
-//     https: true,
-//     //     {
-//     //   // key: './certs/key.pem', // Path to the SSL private key
-//     //   // cert: './certs/cert.crt', // Path to the SSL certificate
-//     // },
+//     https: {
+//       key:fs.readFileSync("./key.pem"),
+//       cert:fs.readFileSync("./cert.crt")
+//     },
 //     watch: {
 //       usePolling: true, // Enable polling for changes
 //     },
