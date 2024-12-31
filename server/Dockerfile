@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 FROM node:18-alpine
 WORKDIR /usr/src/app
 
@@ -16,7 +15,7 @@ RUN yarn global add nodemon
 COPY . .
 
 # Expose port 3001
-#EXPOSE 3001
+EXPOSE 3001
 
 # Run the application with nodemon
 CMD ["nodemon", "src/index.js"]
