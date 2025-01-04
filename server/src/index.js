@@ -19,8 +19,15 @@ const options = {
 };
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL2,
 });
+// const pool = new Pool({
+//     user: "postgres",
+//     host: process.env.ENDPOINT,
+//     database: "mydb",
+//     password: "postgres",
+//     port: 5432,
+// });
 
 app.use(cors());
 app.use(express.json());
@@ -82,13 +89,14 @@ app.post("/signup", async (req, res) => {
 
 
 app.get("/users", async (req, res) => {
+    console.log(pool)
     try {
         const query = "SELECT userid, username, email FROM Users";
         const result = await pool.query(query);
         res.status(200).json(result.rows);
     } catch (error) {
         res.status(500).json({
-            error: "An error occurred while fetching users.",
+            error: "An error occurred while fetching users. DATABASE_URL2 rds: " + process.env.DATABASE_URL2,
             details: error.message,
         });
     }

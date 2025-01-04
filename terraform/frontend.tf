@@ -1,5 +1,17 @@
+#konfiguracja pliku env dla frontendu
+resource "local_file" "env_file_frontend" {
+  content = <<EOT
+VITE_APP_PUBLIC_DNS=http://${module.alb.lb_dns_name}
+VITE_APP_SERVER=http://${module.alb_backend.lb_dns_name}
+EOT
+
+  filename = "../client/.env"
+}
+
+
 #frontend poprawić nazwy żeby były z dopiskiem frontend
 module "ecr" {
+  depends_on = [local_file.env_file_frontend]
   source  = "terraform-aws-modules/ecr/aws"
   version = "~> 1.6.0"
 
@@ -150,6 +162,7 @@ resource "aws_ecs_service" "this" {
  }
 }
 
+
 # * Output the URL of our Application Load Balancer so that we can connect to
 # * our application running inside ECS once it is up and running.
-output "url" { value = "http://${module.alb.lb_dns_name}" }
+output "frontend_url" { value = "http://${module.alb.lb_dns_name}" }

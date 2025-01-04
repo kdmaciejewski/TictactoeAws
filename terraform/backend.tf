@@ -1,7 +1,41 @@
+#konfiguracja pliku env dla backendu
+#resource "local_file" "env_file" {
+#  depends_on = [aws_db_instance.db]
+#  content    = <<EOT
+#DATABASE_URL=${format(
+#    "postgres://%s:%s@%s/%s",
+#    aws_db_instance.db.username,
+#    aws_db_instance.db.password,
+#    aws_db_instance.db.endpoint,
+#    aws_db_instance.db.db_name
+#)}
+#ENDPOINT=aws_db_instance.db.endpoint
+#EOT
+#
+#  filename = "../server/.env"
+#}
+resource "local_file" "env_file" {
+  depends_on = [aws_db_instance.db]
+  content    = <<EOT
+DATABASE_URL2=postgres://postgres:postgres@terraform-20250104102318408900000008.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+EOT
+
+  filename = "../server/.env"
+}
+#resource "local_file" "env_file" {
+#  depends_on = [aws_db_instance.db]
+#  content    = <<EOT
+#ENDPOINT=terraform-20250104102318408900000008.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432
+#EOT
+#
+#  filename = "../server/.env"
+#}
+
 # Add ECR Repository for Backend
 module "ecr_backend" {
-  source  = "terraform-aws-modules/ecr/aws"
-  version = "~> 1.6.0"
+  depends_on = [local_file.env_file]
+  source     = "terraform-aws-modules/ecr/aws"
+  version    = "~> 1.6.0"
 
   repository_force_delete     = true
   repository_name             = "${local.example}-backend"
@@ -23,13 +57,16 @@ module "ecr_backend" {
 
 # Docker Image for Backend
 resource "docker_image" "backend" {
-  name = format("%v:%v", module.ecr_backend.repository_url, formatdate("YYYY-MM-DD'T'hh-mm-ss", timestamp()))
+  depends_on = [local_file.env_file]
+  name       = format("%v:%v", module.ecr_backend.repository_url, formatdate("YYYY-MM-DD'T'hh-mm-ss", timestamp()))
 
   build { context = "../server/" }
   # Path to backend Dockerfile
 }
 
 resource "docker_registry_image" "backend" {
+  depends_on = [local_file.env_file]
+
   keep_remotely = true
   name          = docker_image.backend.name
 }
@@ -37,6 +74,8 @@ resource "docker_registry_image" "backend" {
 # Add Backend Target Group
 #czy ja muszę definiować drugi raz to samo???
 module "alb_backend" {
+  depends_on = [local_file.env_file]
+
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 8.4.0"
 
@@ -82,6 +121,8 @@ module "alb_backend" {
 }
 
 module "ecs_backend" {
+  depends_on = [local_file.env_file]
+
   source  = "terraform-aws-modules/ecs/aws"
   version = "~> 4.1.3"
 
@@ -106,9 +147,21 @@ module "ecs_backend" {
   }
 }
 
+
+#
+#resource "aws_cloudwatch_log_group" "backend_logs" {
+#  name              = "/logiBackendowe"
+#  retention_in_days = 7
+#}
+
+
+
 # ECS Task Definition for Backend
 # przekazuje outputy rds
 resource "aws_ecs_task_definition" "backend" {
+  #tu chyba powinno być coś w stylu: a te logi są tworzone w złym miejscu może
+  #depends_on = [aws_cloudwatch_log_group.backend_logs]
+  depends_on            = [local_file.env_file]
   container_definitions = jsonencode([
     {
       environment : [
@@ -132,6 +185,16 @@ resource "aws_ecs_task_definition" "backend" {
       image        = docker_registry_image.backend.name,
       name         = local.container_name_backend,
       portMappings = [{ containerPort = local.container_port_backend }]
+      #      logConfiguration = {
+      #        logDriver = "awslogs"
+      #        options   = {
+      #          #          awslogs-group         = "/ecs/${local.example}-backend"
+      #          awslogs-group         = "/logiBackendowe"
+      #      awslogs-group         = aws_cloudwatch_log_group.backend_logs.name
+      #          awslogs-region        = "us-east-1"
+      #          awslogs-stream-prefix = "ecs"
+      #        }
+      #      }
     }
   ])
   cpu                      = 256
@@ -140,13 +203,30 @@ resource "aws_ecs_task_definition" "backend" {
   memory                   = 512
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
+
 }
 
+#resource "aws_iam_role_policy" "ecs_task_logging" {
+#  role   = "LabRole"
+#  policy = jsonencode({
+#    Version   = "2012-10-17",
+#    Statement = [
+#      {
+#        Effect = "Allow",
+#        Action = [
+#          "logs:CreateLogStream",
+#          "logs:PutLogEvents"
+#        ],
+#        Resource = "arn:aws:logs:us-east-1:*:log-group:/ecs/*"
+#      }
+#    ]
+#  })
+#}
 
 # ECS Service for Backend
 # osobny desired_count dla backendowego serwisu ecs
 resource "aws_ecs_service" "backend" {
-  depends_on      = [module.alb_backend]
+  depends_on      = [module.alb_backend, local_file.env_file]
   cluster         = module.ecs_backend.cluster_id
   desired_count   = 1
   launch_type     = "FARGATE"
@@ -169,23 +249,21 @@ resource "aws_ecs_service" "backend" {
   }
 }
 
-#konfiguracja pliku env dla backendu
-resource "local_file" "env_file" {
-  content = <<EOT
-DATABASE_URL=${format(
+
+# Output Backend URL
+output "backend_url" {
+  value = "http://${module.alb_backend.lb_dns_name}"
+}
+
+output "rds_url" {
+  value = nonsensitive(format(
     "postgres://%s:%s@%s/%s",
     aws_db_instance.db.username,
     aws_db_instance.db.password,
     aws_db_instance.db.endpoint,
     aws_db_instance.db.db_name
-)}
-EOT
-
-  filename = "../server/.env"
+  ))
 }
-
-
-# Output Backend URL
-output "backend_url" {
-  value = "http://${module.alb_backend.lb_dns_name}"
+output "rds_endpoint" {
+  value = nonsensitive(aws_db_instance.db.endpoint)
 }

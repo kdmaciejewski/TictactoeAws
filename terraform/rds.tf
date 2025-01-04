@@ -53,23 +53,19 @@ resource "aws_db_instance" "db" {
 }
 
 output "db_host" {
-  value     = aws_db_instance.db.endpoint
-  sensitive = true
+  value     = nonsensitive(aws_db_instance.db.endpoint)
 }
 
 output "db_name" {
-  value     = aws_db_instance.db.db_name
-  sensitive = true
+  value     = nonsensitive(aws_db_instance.db.db_name)
 }
 
 output "db_username" {
-  value     = aws_db_instance.db.username
-  sensitive = true
+  value     = nonsensitive(aws_db_instance.db.username)
 }
 
 output "db_password" {
-  value     = aws_db_instance.db.password
-  sensitive = true
+  value     = nonsensitive(aws_db_instance.db.password)
 }
 
 #resource "null_resource" "setup_db" {
@@ -88,16 +84,16 @@ output "db_password" {
 #  }
 #}
 
-resource "null_resource" "setup_db" {
-  depends_on = [aws_db_instance.db] # Wait for the DB to be ready
-
-  provisioner "local-exec" {
-    command = <<EOT
-set PGPASSWORD=${aws_db_instance.db.password}
-psql -h ${aws_db_instance.db.endpoint} -U ${aws_db_instance.db.username} -d ${aws_db_instance.db.db_name} -a -f db_script.sql
-EOT
-  }
-}
+#resource "null_resource" "setup_db" {
+#  depends_on = [aws_db_instance.db] # Wait for the DB to be ready
+#
+#  provisioner "local-exec" {
+#    command = <<EOT
+#set PGPASSWORD=${aws_db_instance.db.password}
+#psql -h ${aws_db_instance.db.endpoint} -U ${aws_db_instance.db.username} -d ${aws_db_instance.db.db_name} -a -f db_script.sql
+#EOT
+#  }
+#}
 
 #resource "null_resource" "setup_db" {
 #  depends_on = [aws_db_instance.db] # Wait for the DB to be ready
