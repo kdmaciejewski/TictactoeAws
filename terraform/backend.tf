@@ -1,35 +1,30 @@
 #konfiguracja pliku env dla backendu
-#resource "local_file" "env_file" {
-#  depends_on = [aws_db_instance.db]
-#  content    = <<EOT
-#DATABASE_URL=${format(
-#    "postgres://%s:%s@%s/%s",
-#    aws_db_instance.db.username,
-#    aws_db_instance.db.password,
-#    aws_db_instance.db.endpoint,
-#    aws_db_instance.db.db_name
-#)}
-#ENDPOINT=aws_db_instance.db.endpoint
-#EOT
-#
-#  filename = "../server/.env"
-#}
 resource "local_file" "env_file" {
   depends_on = [aws_db_instance.db]
   content    = <<EOT
-DATABASE_URL2=postgres://postgres:postgres@terraform-20250104102318408900000008.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+DATABASE_URL2=${format(
+    "postgres://%s:%s@%s/%s",
+    aws_db_instance.db.username,
+    aws_db_instance.db.password,
+    aws_db_instance.db.endpoint,
+    aws_db_instance.db.db_name
+)}
+ENDPOINT=${aws_db_instance.db.endpoint}
+SQS_QUEUE_URL=${aws_sqs_queue.message_queue.url}
 EOT
 
   filename = "../server/.env"
 }
+
 #resource "local_file" "env_file" {
 #  depends_on = [aws_db_instance.db]
 #  content    = <<EOT
-#ENDPOINT=terraform-20250104102318408900000008.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432
+#DATABASE_URL2=postgres://postgres:postgres@terraform-20250105121604643200000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
 #EOT
 #
 #  filename = "../server/.env"
 #}
+
 
 # Add ECR Repository for Backend
 module "ecr_backend" {
