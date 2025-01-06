@@ -17,7 +17,7 @@
 resource "local_file" "env_file" {
   depends_on = [aws_db_instance.db]
   content    = <<EOT
-DATABASE_URL2=postgres://postgres:postgres@terraform-20250104102318408900000008.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+DATABASE_URL2=postgres://postgres:postgres@terraform-20250106100043579500000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
 EOT
 
   filename = "../server/.env"
