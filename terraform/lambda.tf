@@ -2,7 +2,6 @@ data "aws_iam_role" "lab_role" {
   name = "LabRole"
 }
 
-
 data "archive_file" "zip_the_node_code" {
   type        = "zip"
   source_dir  = "${path.module}/lambda/"
@@ -10,16 +9,20 @@ data "archive_file" "zip_the_node_code" {
 }
 
 resource "aws_lambda_function" "message_processor" {
-  filename         = "${path.module}/lambda/message-processor.zip"
-  function_name    = "MessageProcessor"
-  role             = data.aws_iam_role.lab_role.arn
-  handler          = "index.lambda_handler"
-  runtime          = "python3.8"
+  filename                       = "${path.module}/lambda/message-processor.zip"
+  function_name                  = "MessageProcessor"
+  role                           = data.aws_iam_role.lab_role.arn
+  handler                        = "index.lambda_handler"
+  runtime                        = "python3.8"
   reserved_concurrent_executions = 2 # Limit to 2 concurrent instances
 
   environment {
     variables = {
       SQS_QUEUE_URL = aws_sqs_queue.message_queue.id
+      DB_HOST     = aws_db_instance.db.endpoint
+      DB_USER     = aws_db_instance.db.username
+      DB_PASSWORD = aws_db_instance.db.password
+      DB_NAME     = aws_db_instance.db.db_name
     }
   }
 

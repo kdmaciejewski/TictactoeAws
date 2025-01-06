@@ -63,5 +63,25 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
+#coś do health check wcześniej tego nie było
+#na backendzie dodałęm endpoint /health który zwraca 200
+#resource "aws_lb_target_group" "backend" {
+#  name        = "${local.example}-backend-tg"
+#  port        = 3001  #port backendowego tasku
+#  protocol    = "HTTP"
+#  target_type = "ip"
+#  vpc_id      = module.vpc.vpc_id
+#
+#  health_check {
+#    path                = "/health"
+#    interval            = 30
+#    timeout             = 5
+#    healthy_threshold   = 3
+#    unhealthy_threshold = 3
+#    matcher             = "200"
+#  }
+#}
+
+
 #LAAAAAAAAAAABROOOOOLLLEEEEE
 data "aws_iam_role" "ecs_task_execution_role" { name = "LabRole" }

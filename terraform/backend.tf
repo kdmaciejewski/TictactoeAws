@@ -1,15 +1,14 @@
 #konfiguracja pliku env dla backendu
 resource "local_file" "env_file" {
-  depends_on = [aws_db_instance.db]
+  depends_on = [aws_db_instance.db, aws_sqs_queue.message_queue]
   content    = <<EOT
-DATABASE_URL2=${format(
+DATABASE_URL3=${format(
     "postgres://%s:%s@%s/%s",
     aws_db_instance.db.username,
     aws_db_instance.db.password,
     aws_db_instance.db.endpoint,
     aws_db_instance.db.db_name
 )}
-ENDPOINT=${aws_db_instance.db.endpoint}
 SQS_QUEUE_URL=${aws_sqs_queue.message_queue.url}
 EOT
 
@@ -19,7 +18,8 @@ EOT
 #resource "local_file" "env_file" {
 #  depends_on = [aws_db_instance.db]
 #  content    = <<EOT
-#DATABASE_URL2=postgres://postgres:postgres@terraform-20250105121604643200000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+#DATABASE_URL3=postgres://postgres:postgres@terraform-20250105121604643200000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+#SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/825252643450/MessageQueue
 #EOT
 #
 #  filename = "../server/.env"
@@ -67,7 +67,8 @@ resource "docker_registry_image" "backend" {
 }
 
 # Add Backend Target Group
-#czy ja muszę definiować drugi raz to samo???
+#ALB rozdziela ruch przychodzący (HTTP/HTTPS) pomiędzy instancje, kontenery lub zadania w celu
+#skalowalności i wysokiej dostępności. Obsługuje routing na podstawie ścieżek
 module "alb_backend" {
   depends_on = [local_file.env_file]
 
@@ -98,14 +99,6 @@ module "alb_backend" {
     }
   }
 
-  target_groups = [
-    {
-      backend_port     = local.container_port_backend
-      backend_protocol = "HTTP"
-      target_type      = "ip"
-    }
-  ]
-  #dodane
   http_tcp_listeners = [
     {
       port               = 80
@@ -113,8 +106,44 @@ module "alb_backend" {
       target_group_index = 0
     }
   ]
+
+  target_groups = [
+    {
+      backend_port     = local.container_port_backend
+      backend_protocol = "HTTP"
+      target_type      = "ip"
+    }
+  ]
+
+#  target_groups = [
+#    {
+#      backend_port     = 3001
+#      backend_protocol = "HTTP"
+#      target_type      = "ip"
+#      health_check     = {
+#        path                = "/health"
+#        interval            = 45
+#        timeout             = 5
+#        healthy_threshold   = 3
+#        unhealthy_threshold = 3
+#        matcher             = "200"
+#      }
+#    }
+#  ]
+
+  #dodane
+  #  http_tcp_listeners = [
+  #    {
+  #      port               = 80
+  #      protocol           = "HTTP"
+  #      target_group_index = 0
+  #    }
+  #  ]
 }
 
+#Elastic Container Service
+#ECS zarządza uruchamianiem i skalowaniem kontenerów Docker. Tworzy zadania (tasks),
+#które działają na klastrach (Fargate lub EC2) i obsługuje sieci, logi oraz zasoby dla kontenerów.
 module "ecs_backend" {
   depends_on = [local_file.env_file]
 
@@ -151,7 +180,6 @@ module "ecs_backend" {
 
 
 
-# ECS Task Definition for Backend
 # przekazuje outputy rds
 resource "aws_ecs_task_definition" "backend" {
   #tu chyba powinno być coś w stylu: a te logi są tworzone w złym miejscu może

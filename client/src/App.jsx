@@ -3,7 +3,7 @@ import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Chat from "./components/Chat"
 import Cookies from "universal-cookie";
-import {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 
 function App() {

@@ -8,6 +8,9 @@ resource "aws_sqs_queue" "message_queue" {
   sqs_managed_sse_enabled = true # sse - server side encryption
 }
 
+output "sqs_url" {
+  value = aws_sqs_queue.message_queue.url
+}
 #data "aws_iam_policy_document" "sh_sqs_policy" {
 #  statement {
 #    sid    = "shsqsstatement"
