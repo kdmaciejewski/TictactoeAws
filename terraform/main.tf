@@ -65,3 +65,13 @@ module "vpc" {
 
 #LAAAAAAAAAAABROOOOOLLLEEEEE
 data "aws_iam_role" "ecs_task_execution_role" { name = "LabRole" }
+
+## Create permission to allow lambda to attach API gateway
+#resource "aws_lambda_permission" "apigw_permission" {
+#  statement_id  = "AllowAPIGatewayInvoke"
+#  action        = "lambda:InvokeFunction"
+#  function_name = aws_lambda_function.is-odd.function_name
+#  principal     = "apigateway.amazonaws.com"
+#
+#  source_arn = "${aws_apigatewayv2_api.is_odd_api.execution_arn}/*/*"
+#}

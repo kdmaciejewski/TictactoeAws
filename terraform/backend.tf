@@ -9,27 +9,30 @@
 #    aws_db_instance.db.endpoint,
 #    aws_db_instance.db.db_name
 #)}
-#ENDPOINT=aws_db_instance.db.endpoint
+#SQS_QUEUE_URL=${aws_sqs_queue.message_queue.url}
 #EOT
 #
 #  filename = "../server/.env"
 #}
+
+#resource "local_file" "env_file" {
+#  depends_on = [aws_db_instance.db]
+#  content    = <<EOT
+#DATABASE_URL2=postgres://postgres:postgres@terraform-20250106100043579500000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+#EOT
+#
+#  filename = "../server/.env"
+#}
+
 resource "local_file" "env_file" {
   depends_on = [aws_db_instance.db]
   content    = <<EOT
-DATABASE_URL2=postgres://postgres:postgres@terraform-20250106100043579500000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+DATABASE_URL2=postgres://postgres:postgres@terraform-20250107091227017500000005.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432/mydb
+SQS_QUEUE_URL=https://sqs.us-east-1.amazonaws.com/825252643450/MessageQueue
 EOT
 
   filename = "../server/.env"
 }
-#resource "local_file" "env_file" {
-#  depends_on = [aws_db_instance.db]
-#  content    = <<EOT
-#ENDPOINT=terraform-20250104102318408900000008.c16ejl6j0lwa.us-east-1.rds.amazonaws.com:5432
-#EOT
-#
-#  filename = "../server/.env"
-#}
 
 # Add ECR Repository for Backend
 module "ecr_backend" {
@@ -72,7 +75,6 @@ resource "docker_registry_image" "backend" {
 }
 
 # Add Backend Target Group
-#czy ja muszę definiować drugi raz to samo???
 module "alb_backend" {
   depends_on = [local_file.env_file]
 
@@ -103,11 +105,26 @@ module "alb_backend" {
     }
   }
 
+#  target_groups = [
+#    {
+#      backend_port     = local.container_port_backend
+#      backend_protocol = "HTTP"
+#      target_type      = "ip"
+#    }
+#  ]
   target_groups = [
     {
-      backend_port     = local.container_port_backend
+      backend_port     = 3001
       backend_protocol = "HTTP"
       target_type      = "ip"
+      health_check     = {
+        path                = "/health"
+        interval            = 45
+        timeout             = 5
+        healthy_threshold   = 3
+        unhealthy_threshold = 3
+        matcher             = "200"
+      }
     }
   ]
   #dodane

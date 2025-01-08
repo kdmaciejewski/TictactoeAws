@@ -140,48 +140,52 @@ app.get("/messages", async (req, res) => {
     }
 });
 
-// app.post("/messages", async (req, res) => {
-//     const { text } = req.body;
-//
-//     try {
-//         // Send the message to SQS
-//         const params = {
-//             QueueUrl: process.env.SQS_QUEUE_URL,
-//             MessageBody: text,
-//         };
-//
-//         await sqs.sendMessage(params).promise();
-//
-//         res.status(201).json({
-//             message: "Message sent to queue successfully.",
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             error: "An error occurred while sending the message to the queue.",
-//             details: error.message,
-//         });
-//     }
-// });
-
 app.post("/messages", async (req, res) => {
     const { text } = req.body;
 
     try {
-        const query = "INSERT INTO messages (text) VALUES ($1) RETURNING id, text";
-        const values = [text];
-        const result = await pool.query(query, values);
+        // Send the message to SQS
+        const params = {
+            QueueUrl: process.env.SQS_QUEUE_URL,
+            MessageBody: text,
+        };
+
+        await sqs.sendMessage(params).promise();
 
         res.status(201).json({
-            message: "Message added successfully.",
-            data: result.rows[0],
+            message: "Message sent to queue successfully.",
         });
     } catch (error) {
         res.status(500).json({
-            error: "An error occurred while adding the message.",
+            error: "An error occurred while sending the message to the queue.",
             details: error.message,
         });
     }
 });
+
+app.get('/health', (req, res) => {
+    res.status(200).send("OK");
+});
+
+// app.post("/messages", async (req, res) => {
+//     const { text } = req.body;
+//
+//     try {
+//         const query = "INSERT INTO messages (text) VALUES ($1) RETURNING id, text";
+//         const values = [text];
+//         const result = await pool.query(query, values);
+//
+//         res.status(201).json({
+//             message: "Message added successfully.",
+//             data: result.rows[0],
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             error: "An error occurred while adding the message.",
+//             details: error.message,
+//         });
+//     }
+// });
 
 
 // Create the database schema on server start
