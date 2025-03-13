@@ -32,7 +32,7 @@ resource "aws_security_group" "rds_sg" {
 
 resource "aws_db_subnet_group" "app_subnet_group" {
   name       = "${local.example}-db-subnet-group"
-  subnet_ids = module.vpc.public_subnets
+  subnet_ids = module.vpc.public_subnets   ///zmieniłem z public subnets
 
   tags = {
     Name = "${local.example}-db-subnet-group"
@@ -53,19 +53,19 @@ resource "aws_db_instance" "db" {
 }
 
 output "db_host" {
-  value     = nonsensitive(aws_db_instance.db.endpoint)
+  value = nonsensitive(aws_db_instance.db.endpoint)
 }
 
 output "db_name" {
-  value     = nonsensitive(aws_db_instance.db.db_name)
+  value = nonsensitive(aws_db_instance.db.db_name)
 }
 
 output "db_username" {
-  value     = nonsensitive(aws_db_instance.db.username)
+  value = nonsensitive(aws_db_instance.db.username)
 }
 
 output "db_password" {
-  value     = nonsensitive(aws_db_instance.db.password)
+  value = nonsensitive(aws_db_instance.db.password)
 }
 
 #resource "null_resource" "setup_db" {

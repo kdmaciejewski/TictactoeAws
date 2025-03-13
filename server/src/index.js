@@ -164,6 +164,10 @@ app.post("/messages", async (req, res) => {
         });
     }
 });
+
+app.get('/health', (req, res) => {
+    res.status(200).send("OK");
+});
 // app.post("/messages", async (req, res) => {
 //     const { text } = req.body;
 //
@@ -183,9 +187,7 @@ app.post("/messages", async (req, res) => {
 //         });
 //     }
 // });
-app.get('/health', (req, res) => {
-    res.status(200).send("OK");
-});
+
 
 // Create the database schema on server start
 // createDatabaseSchema(pool);
