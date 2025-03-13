@@ -34,6 +34,7 @@ EOT
   filename = "../server/.env"
 }
 
+
 # Add ECR Repository for Backend
 module "ecr_backend" {
   depends_on = [local_file.env_file]
@@ -75,6 +76,9 @@ resource "docker_registry_image" "backend" {
 }
 
 # Add Backend Target Group
+#ALB rozdziela ruch przychodzący (HTTP/HTTPS) pomiędzy instancje, kontenery lub zadania w celu
+#skalowalności i wysokiej dostępności. Obsługuje routing na podstawie ścieżek
+
 module "alb_backend" {
   depends_on = [local_file.env_file]
 
@@ -112,6 +116,7 @@ module "alb_backend" {
 #      target_type      = "ip"
 #    }
 #  ]
+
   target_groups = [
     {
       backend_port     = 3001
@@ -127,16 +132,36 @@ module "alb_backend" {
       }
     }
   ]
+
+#  target_groups = [
+#    {
+#      backend_port     = 3001
+#      backend_protocol = "HTTP"
+#      target_type      = "ip"
+#      health_check     = {
+#        path                = "/health"
+#        interval            = 45
+#        timeout             = 5
+#        healthy_threshold   = 3
+#        unhealthy_threshold = 3
+#        matcher             = "200"
+#      }
+#    }
+#  ]
+
   #dodane
-  http_tcp_listeners = [
-    {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
-    }
-  ]
+  #  http_tcp_listeners = [
+  #    {
+  #      port               = 80
+  #      protocol           = "HTTP"
+  #      target_group_index = 0
+  #    }
+  #  ]
 }
 
+#Elastic Container Service
+#ECS zarządza uruchamianiem i skalowaniem kontenerów Docker. Tworzy zadania (tasks),
+#które działają na klastrach (Fargate lub EC2) i obsługuje sieci, logi oraz zasoby dla kontenerów.
 module "ecs_backend" {
   depends_on = [local_file.env_file]
 
@@ -173,7 +198,6 @@ module "ecs_backend" {
 
 
 
-# ECS Task Definition for Backend
 # przekazuje outputy rds
 resource "aws_ecs_task_definition" "backend" {
   #tu chyba powinno być coś w stylu: a te logi są tworzone w złym miejscu może

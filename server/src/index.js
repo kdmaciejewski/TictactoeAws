@@ -19,7 +19,7 @@ const options = {
 };
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL2,
+    connectionString: process.env.DATABASE_URL3,
 });
 // const pool = new Pool({
 //     user: "postgres",
@@ -31,6 +31,8 @@ const pool = new Pool({
 
 app.use(cors());
 app.use(express.json());
+const AWS = require("aws-sdk");
+const sqs = new AWS.SQS({ region: "us-east-1" });
 
 async function initializeDatabase() {
   try {
@@ -96,7 +98,7 @@ app.get("/users", async (req, res) => {
         res.status(200).json(result.rows);
     } catch (error) {
         res.status(500).json({
-            error: "An error occurred while fetching users. DATABASE_URL2 rds: " + process.env.DATABASE_URL2,
+            error: "An error occurred while fetching users. DATABASE_URL3 rds: " + process.env.DATABASE_URL3,
             details: error.message,
         });
     }
@@ -166,7 +168,6 @@ app.post("/messages", async (req, res) => {
 app.get('/health', (req, res) => {
     res.status(200).send("OK");
 });
-
 // app.post("/messages", async (req, res) => {
 //     const { text } = req.body;
 //
@@ -190,6 +191,8 @@ app.get('/health', (req, res) => {
 
 // Create the database schema on server start
 // createDatabaseSchema(pool);
+
+
 
 app.listen(3001, () => {
     console.log("HTTP server is running on port 3001");
