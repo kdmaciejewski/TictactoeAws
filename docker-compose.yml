@@ -6,11 +6,16 @@ services:
       context: ./client  # Ścieżka do katalogu frontendu
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"  # Mapowanie portu 3000 kontenera na port 3000 hosta
+      - "3000:3000"
     depends_on:
       - backend
     env_file:
       - ./client/.env
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
 
   backend:
     build:
@@ -18,16 +23,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app
+      - /app/node_modules
     environment:
-      DATABASE_URL: "postgres://postgres:Maciejewski12@db:5432/tictactoe"
-    depends_on:
-      - db
-
-  db:
-    image: postgres:latest  # Użycie obrazu Postgresa
-    environment:
-      POSTGRES_USER: postgres  # Użytkownik bazy danych
-      POSTGRES_PASSWORD: Maciejewski12  # Hasło użytkownika
-      POSTGRES_DB: tictactoe  # Nazwa bazy danych
-    ports:
-      - "5432:5432"  # Mapowanie portu bazy danych
+      NODE_TLS_REJECT_UNAUTHORIZED: "0"
