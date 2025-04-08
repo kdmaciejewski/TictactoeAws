@@ -5,3 +5,4 @@
 /server/.env!/client/.env
 /server/node_modules/
 /.idea/
+/terraform/medium_tutorial_1/terraform.tfvars
